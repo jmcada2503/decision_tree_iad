@@ -60,6 +60,37 @@ class DecisionTree():
 
             return actual_string
 
+    def _recursiveReinitialice(self, node):
+        node.value = None
+        if not isinstance(node, LeafNode):
+            node.value = None
+            if isinstance(node, DecisionNode):
+                node.decision = None
+            for posibility in node.posibilities:
+                self._recursiveReinitialice(posibility.next_node)
+
+    def reinitialice(self, decision_criteria, probability_compute):
+        self._recursiveReinitialice(self.root)
+
+        self._decision_criteria = decision_criteria
+        self._probability_compute = probability_compute
+
+        self._computeLeafsValues(self.root, 0)
+        self._computeNodeValue(self.root)
+
+    def _getDecisionsPreOrder(self, node):
+        decisions = []
+        if isinstance(node, DecisionNode):
+            decisions.append(node.decision)
+        elif isinstance(node, LeafNode):
+            return []
+        for posibility in node.posibilities:
+            decisions += self._getDecisionsPreOrder(posibility.next_node)
+        return decisions
+
+    def getDecisionsPreOrder(self):
+        return self._getDecisionsPreOrder(self.root)
+
     def __str__(self):
         return self._recursivePrint(self.root, 0, best_way=True)
 
